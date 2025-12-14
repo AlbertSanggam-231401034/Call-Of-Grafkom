@@ -5,15 +5,15 @@ using System.Collections.Generic;
 public class MazeGenerator : MonoBehaviour
 {
     [Header("Main Prefabs")]
-    public MazeCell cellPrefab; // Masukkan Prefab 'MazeCell' di sini
-    public GameObject enemyPrefab; // Masukkan Prefab 'EnemyCCTV' di sini
+    public MazeCell cellPrefab; 
+    public GameObject enemyPrefab;
     public GameObject playerPrefab;
     public GameObject exitPrefab;
 
     [Header("Settings")]
     public int mazeWidth = 10;
     public int mazeHeight = 10;
-    public float cellSize = 4f; // Jarak antar cell (Sesuaikan dengan ukuran lantai MazeCell)
+    public float cellSize = 4f; 
 
     [Header("Enemy Settings")]
     public float enemyHeight = 1.5f; // TINGGI ENEMY (Turunkan jika ketinggian)
@@ -35,21 +35,18 @@ public class MazeGenerator : MonoBehaviour
         {
             for (int z = 0; z < mazeHeight; z++)
             {
-                // Posisikan cell berdasarkan cellSize
                 Vector3 pos = new Vector3(x * cellSize, 0, z * cellSize);
                 MazeCell newCell = Instantiate(cellPrefab, pos, Quaternion.identity);
 
                 newCell.transform.parent = transform;
                 newCell.name = $"Cell {x},{z}";
 
-                // Simpan di array
                 _mazeGrid[x, z] = newCell;
             }
         }
 
         // 2. Algoritma Pembuka Jalan (Recursive Backtracker)
-        // Ini yang membuat labirin "Tipis" dan menyambung sempurna
-        WaitForSeconds delay = new WaitForSeconds(0.01f); // Animasi pelan (bisa dihapus biar instan)
+        WaitForSeconds delay = new WaitForSeconds(0.01f);
         Stack<Vector2Int> stack = new Stack<Vector2Int>();
 
         Vector2Int startCoords = new Vector2Int(0, 0);
@@ -82,7 +79,6 @@ public class MazeGenerator : MonoBehaviour
         startPos.y = 0.5f;
         GameObject player = Instantiate(playerPrefab, startPos, Quaternion.identity);
         player.name = "Player";
-        // Pastikan player kecil sesuai request
         player.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
 
         // 4. Spawn Exit di ujung
@@ -112,15 +108,11 @@ public class MazeGenerator : MonoBehaviour
 
             // Cari dinding yang AKTIF (masih ada) untuk ditempeli CCTV
             List<Transform> walls = new List<Transform>();
-            List<Vector3> looks = new List<Vector3>(); // Arah pandang CCTV
+            List<Vector3> looks = new List<Vector3>(); 
 
-            // Cek dinding Top (Utara)
             if (cell.wallTop.activeSelf) { walls.Add(cell.wallTop.transform); looks.Add(Vector3.back); }
-            // Cek dinding Bottom (Selatan)
             if (cell.wallBottom.activeSelf) { walls.Add(cell.wallBottom.transform); looks.Add(Vector3.forward); }
-            // Cek dinding Left (Barat)
             if (cell.wallLeft.activeSelf) { walls.Add(cell.wallLeft.transform); looks.Add(Vector3.right); }
-            // Cek dinding Right (Timur)
             if (cell.wallRight.activeSelf) { walls.Add(cell.wallRight.transform); looks.Add(Vector3.left); }
 
             if (walls.Count > 0)
@@ -129,8 +121,8 @@ public class MazeGenerator : MonoBehaviour
 
                 // Posisi: Di dinding tersebut, geser sedikit ke dalam, tinggi sesuai setting
                 Vector3 wallPos = walls[r].position;
-                Vector3 spawnPos = wallPos + (looks[r] * 0.4f); // 0.4f adalah offset biar ga tenggelam di tembok
-                spawnPos.y = enemyHeight; // Tinggi CCTV diatur di Inspector
+                Vector3 spawnPos = wallPos + (looks[r] * 0.4f);
+                spawnPos.y = enemyHeight;
 
                 Instantiate(enemyPrefab, spawnPos, Quaternion.LookRotation(looks[r]));
                 spawned++;
